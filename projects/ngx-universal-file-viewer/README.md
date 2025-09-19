@@ -51,7 +51,7 @@ For Angular 14+ (Standalone Components)
 
 ```bash
 import { Component } from '@angular/core';
-import { NgxUniversalFileViewerComponent } from 'ngx-universal-file-viewer';
+import { NgxUniversalFileViewerComponent   } from 'ngx-universal-file-viewer';
 
 @Component({
   selector: 'app-document-viewer',
@@ -73,7 +73,7 @@ For Angular 12-13 (Module-based)
 ```bash 
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgxUniversalFileViewerModule } from 'ngx-universal-file-viewer';
+import { NgxUniversalFileViewerComponent  } from 'ngx-universal-file-viewer';
 
 import { AppComponent } from './app.component';
 
@@ -93,7 +93,10 @@ Simple Implementation
 ```bash
 <ngx-universal-file-viewer
   [src]="fileUrl"
-  [fileType]="'auto'">
+      [fileType]="'auto'"
+      [viewMode]="'continuous'"
+      [showToolbar]="true"
+      >
 </ngx-universal-file-viewer>
 ```
 TypeScript

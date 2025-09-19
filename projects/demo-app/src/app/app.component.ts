@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
-import {
+import { 
   NgxUniversalFileViewerComponent,
   ToolbarConfig,
-  PageChangeEvent,
-} from '../../../ngx-universal-file-viewer/src/lib/ngx-universal-file-viewer.component';
+  ViewerConfig,
+  PageChangeEvent 
+} from 'ngx-universal-file-viewer';
 
 @Component({
   selector: 'app-root',
@@ -57,7 +58,7 @@ import {
   ],
 })
 export class AppComponent {
-  fileSource = 'assets/hello.docx'; // Change to your file path
+  fileSource = 'assets/hello.pdf'; // Change to your file path
   currentPageInfo: PageChangeEvent | null = null;
 
   toolbarOptions: ToolbarConfig = {

@@ -40,6 +40,7 @@ export interface ViewerConfig {
   enableViewModeToggle?: boolean;
   pdfWorkerSrc?: string;
   theme?: 'light' | 'dark';
+  height?: string;
 }
 
 // Page change event interface
@@ -55,7 +56,12 @@ export interface PageChangeEvent {
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="file-viewer-container" [class.loading]="isLoading" [class.continuous-mode]="viewMode === 'continuous'" [class.page-mode]="viewMode === 'page'">
+    <!-- Template remains the same as previous -->
+    <div class="file-viewer-container" 
+         [class.loading]="isLoading" 
+         [class.continuous-mode]="viewMode === 'continuous'" 
+         [class.page-mode]="viewMode === 'page'"
+         [style.height]="viewerConfig.height || '100vh'">
       
       <!-- Loading Spinner -->
       <div class="loader-wrapper" *ngIf="isLoading">
@@ -151,6 +157,7 @@ export interface PageChangeEvent {
               <option [value]="1.25">125%</option>
               <option [value]="1.5">150%</option>
               <option [value]="2">200%</option>
+              <option [value]="3">300%</option>
             </select>
             <button (click)="zoomIn()" [disabled]="scale >= 3" title="Zoom In">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -175,7 +182,6 @@ export interface PageChangeEvent {
                 <path d="M15.55 5.55L11 1v3.07C7.06 4.56 4 7.92 4 12s3.05 7.44 7 7.93v-2.02c-2.84-.48-5-2.94-5-5.91s2.16-5.43 5-5.91V10l4.55-4.45zM19.93 11c-.17-1.39-.72-2.73-1.62-3.89l-1.42 1.42c.54.75.88 1.6 1.02 2.47h2.02zM13 17.9v2.02c1.39-.17 2.74-.71 3.9-1.61l-1.44-1.44c-.75.54-1.59.89-2.46 1.03zm3.89-2.42l1.42 1.41c.9-1.16 1.45-2.5 1.62-3.89h-2.02c-.14.87-.48 1.72-1.02 2.48z"/>
               </svg>
             </button>
-          
           </div>
         </div>
 
@@ -185,8 +191,8 @@ export interface PageChangeEvent {
         </div>
 
         <!-- Continuous Scroll Container -->
-        <div class="pdf-continuous-container" *ngIf="viewMode === 'continuous'" #continuousContainer>
-          <div *ngFor="let pageNum of pdfPagesArray" class="pdf-page-wrapper">
+        <div class="pdf-continuous-container" *ngIf="viewMode === 'continuous'" #continuousContainer (scroll)="onContinuousScroll($event)">
+          <div *ngFor="let pageNum of pdfPagesArray" class="pdf-page-wrapper" [attr.data-page]="pageNum">
             <div class="page-number">Page {{ pageNum }}</div>
             <canvas [id]="'pdf-page-' + pageNum"></canvas>
           </div>
@@ -196,8 +202,6 @@ export interface PageChangeEvent {
       <!-- Word Document Viewer -->
       <div class="word-viewer" *ngIf="fileType === 'word' && !isLoading && !errorMessage">
         <div class="word-controls" *ngIf="showToolbar">
-          
-          <!-- View Mode Toggle -->
           <div class="control-group" *ngIf="toolbarConfig.showViewModeToggle !== false">
             <button (click)="toggleViewMode()" class="view-mode-btn">
               {{ viewMode === 'continuous' ? 'Page View' : 'Continuous View' }}
@@ -241,8 +245,6 @@ export interface PageChangeEvent {
             </select>
             <button (click)="zoomInWord()" [disabled]="wordZoom >= 2" title="Zoom In">+</button>
           </div>
-
-         
         </div>
 
         <!-- Page Mode -->
@@ -289,19 +291,20 @@ export interface PageChangeEvent {
     </div>
   `,
   styles: [`
+    /* Styles remain the same as previous */
     .file-viewer-container {
       width: 100%;
-      height: 100%;
-      min-height: 600px;
+      height: 100vh;
+      max-height: 100vh;
       background: #f5f5f5;
       border-radius: 8px;
       overflow: hidden;
       position: relative;
       display: flex;
       flex-direction: column;
+      box-sizing: border-box;
     }
 
-    /* View Mode Button */
     .view-mode-btn {
       display: flex;
       align-items: center;
@@ -320,7 +323,6 @@ export interface PageChangeEvent {
       background: #2980b9;
     }
 
-    /* Loading Styles */
     .loader-wrapper {
       position: absolute;
       top: 0;
@@ -369,7 +371,6 @@ export interface PageChangeEvent {
       transition: width 0.3s ease;
     }
 
-    /* Error Styles */
     .error-wrapper {
       display: flex;
       align-items: center;
@@ -407,7 +408,6 @@ export interface PageChangeEvent {
       background: #2980b9;
     }
 
-    /* Controls */
     .pdf-controls, .word-controls, .excel-controls, .ppt-controls {
       background: white;
       padding: 12px 20px;
@@ -418,6 +418,8 @@ export interface PageChangeEvent {
       flex-wrap: wrap;
       gap: 15px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      flex-shrink: 0;
+      min-height: 56px;
     }
 
     .control-group {
@@ -482,42 +484,85 @@ export interface PageChangeEvent {
       cursor: pointer;
     }
 
-    /* PDF Page Mode */
+    .pdf-viewer {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      height: 100%;
+    }
+
     .pdf-canvas-container {
       flex: 1;
       overflow: auto;
       display: flex;
       justify-content: center;
+      align-items: flex-start;
       padding: 20px;
-      background: #e8e8e8;
+      background: #525659;
+      height: calc(100% - 56px);
+      box-sizing: border-box;
     }
 
     canvas {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       background: white;
       max-width: 100%;
       height: auto;
       display: block;
+      image-rendering: crisp-edges;
+      image-rendering: -webkit-optimize-contrast;
+      -ms-interpolation-mode: nearest-neighbor;
     }
 
-    /* PDF Continuous Mode */
     .pdf-continuous-container {
       flex: 1;
       overflow-y: auto;
+      overflow-x: auto;
       padding: 20px;
-      background: #e8e8e8;
+      background: #525659;
+      height: calc(100% - 56px);
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    .pdf-continuous-container::-webkit-scrollbar,
+    .pdf-canvas-container::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    .pdf-continuous-container::-webkit-scrollbar-track,
+    .pdf-canvas-container::-webkit-scrollbar-track {
+      background: #3a3d41;
+      border-radius: 6px;
+    }
+
+    .pdf-continuous-container::-webkit-scrollbar-thumb,
+    .pdf-canvas-container::-webkit-scrollbar-thumb {
+      background: #6b6f75;
+      border-radius: 6px;
+      border: 2px solid #3a3d41;
+    }
+
+    .pdf-continuous-container::-webkit-scrollbar-thumb:hover,
+    .pdf-canvas-container::-webkit-scrollbar-thumb:hover {
+      background: #888;
     }
 
     .pdf-page-wrapper {
       margin-bottom: 20px;
       position: relative;
+      display: flex;
+      justify-content: center;
     }
 
     .pdf-page-wrapper canvas {
       display: block;
-      margin: 0 auto;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       background: white;
+      image-rendering: crisp-edges;
+      image-rendering: -webkit-optimize-contrast;
     }
 
     .page-number {
@@ -532,12 +577,12 @@ export interface PageChangeEvent {
       z-index: 10;
     }
 
-    /* Word Viewer */
     .word-viewer {
       height: 100%;
       display: flex;
       flex-direction: column;
       background: #e5e5e5;
+      overflow: hidden;
     }
 
     .word-document-container {
@@ -548,6 +593,8 @@ export interface PageChangeEvent {
       justify-content: center;
       align-items: flex-start;
       background: #e5e5e5;
+      height: calc(100% - 56px);
+      box-sizing: border-box;
     }
 
     .word-continuous-container {
@@ -555,6 +602,30 @@ export interface PageChangeEvent {
       overflow-y: auto;
       padding: 20px;
       background: #e5e5e5;
+      height: calc(100% - 56px);
+      box-sizing: border-box;
+    }
+
+    .word-document-container::-webkit-scrollbar,
+    .word-continuous-container::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .word-document-container::-webkit-scrollbar-track,
+    .word-continuous-container::-webkit-scrollbar-track {
+      background: #ddd;
+      border-radius: 5px;
+    }
+
+    .word-document-container::-webkit-scrollbar-thumb,
+    .word-continuous-container::-webkit-scrollbar-thumb {
+      background: #999;
+      border-radius: 5px;
+    }
+
+    .word-document-container::-webkit-scrollbar-thumb:hover,
+    .word-continuous-container::-webkit-scrollbar-thumb:hover {
+      background: #777;
     }
 
     .a4-page {
@@ -576,11 +647,11 @@ export interface PageChangeEvent {
       position: relative;
     }
 
-    /* Excel Viewer */
     .excel-viewer {
       height: 100%;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     .table-wrapper {
@@ -588,6 +659,8 @@ export interface PageChangeEvent {
       overflow: auto;
       background: white;
       padding: 20px;
+      height: calc(100% - 56px);
+      box-sizing: border-box;
     }
 
     .table-wrapper table {
@@ -612,11 +685,11 @@ export interface PageChangeEvent {
       z-index: 10;
     }
 
-    /* PPT Viewer */
     .ppt-viewer {
       height: 100%;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     .slide-content {
@@ -627,20 +700,31 @@ export interface PageChangeEvent {
       display: flex;
       align-items: center;
       justify-content: center;
+      height: calc(100% - 56px);
+      box-sizing: border-box;
     }
 
-    /* Responsive */
     @media (max-width: 850px) {
       .a4-page {
         width: calc(100vw - 40px);
         min-height: calc((100vw - 40px) * 1.414);
         padding: 40px;
       }
+
+      .pdf-canvas-container,
+      .pdf-continuous-container {
+        padding: 10px;
+      }
     }
 
     @media (max-width: 768px) {
       .control-group {
         flex-wrap: wrap;
+      }
+
+      .file-viewer-container {
+        height: 100vh;
+        border-radius: 0;
       }
     }
   `]
@@ -655,7 +739,7 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
   @Input() showToolbar: boolean = true;
   @Input() toolbarConfig: ToolbarConfig = {};
   @Input() viewerConfig: ViewerConfig = {};
-  @Input() viewMode: ViewMode = 'continuous'; // Default to continuous scroll
+  @Input() viewMode: ViewMode = 'continuous';
 
   @Output() onLoad = new EventEmitter<any>();
   @Output() onError = new EventEmitter<any>();
@@ -667,35 +751,31 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
   loadingProgress = 0;
   errorMessage = '';
   
-  // Content
   documentContent: SafeHtml = '';
   currentWordPageContent: SafeHtml = '';
   excelContent: SafeHtml = '';
   slideContent: SafeHtml = '';
 
-  // PDF specific
   pdfDocument: any = null;
   currentPage = 1;
   totalPages = 0;
-  scale = 1.0;
+  scale = 1.5;
   rotation = 0;
   pdfPagesArray: number[] = [];
   private pdfLib: any = null;
   private originalFileData: any = null;
+  private devicePixelRatio = 1; // Default value for SSR
 
-  // Word specific
   wordContent: string = '';
   wordPages: string[] = [];
   currentWordPage = 1;
   totalWordPages = 1;
   wordZoom = 1;
 
-  // Excel specific
   excelSheets: string[] = [];
   currentSheet = 0;
   workbook: any;
 
-  // PPT specific
   currentSlide = 1;
   totalSlides = 1;
   slides: string[] = [];
@@ -707,10 +787,14 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
+    
+    // Set devicePixelRatio only in browser environment
+    if (this.isBrowser && typeof window !== 'undefined') {
+      this.devicePixelRatio = window.devicePixelRatio || 1;
+    }
   }
 
   ngOnInit() {
-    // Set default view mode from config
     if (this.viewerConfig.defaultViewMode) {
       this.viewMode = this.viewerConfig.defaultViewMode;
     }
@@ -732,6 +816,12 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     if (!this.isBrowser) return;
 
     return new Promise((resolve, reject) => {
+      // Check if window exists (for SSR)
+      if (typeof window === 'undefined') {
+        reject(new Error('Window is not defined'));
+        return;
+      }
+
       if (window.pdfjsLib) {
         this.pdfLib = window.pdfjsLib;
         resolve();
@@ -871,7 +961,6 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
       this.rotation = 0;
       this.loadingProgress = 90;
 
-      // Generate pages array for continuous mode
       this.pdfPagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
 
       setTimeout(() => {
@@ -903,14 +992,34 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
         throw new Error('Could not get canvas context');
       }
 
-      let viewport = page.getViewport({ scale: this.scale, rotation: this.rotation });
+      // Get device pixel ratio (safe for SSR)
+      const outputScale = this.isBrowser && typeof window !== 'undefined' 
+        ? (window.devicePixelRatio || 1) 
+        : 1;
 
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+      const viewport = page.getViewport({ 
+        scale: this.scale * outputScale, 
+        rotation: this.rotation 
+      });
+
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+
+      canvas.style.width = Math.floor(viewport.width / outputScale) + 'px';
+      canvas.style.height = Math.floor(viewport.height / outputScale) + 'px';
+
+      // Enable high quality rendering
+      context.imageSmoothingEnabled = false;
+      // Use type assertion for vendor-specific properties
+      (context as any).webkitImageSmoothingEnabled = false;
+      (context as any).mozImageSmoothingEnabled = false;
+      (context as any).msImageSmoothingEnabled = false;
 
       const renderContext = {
         canvasContext: context,
-        viewport: viewport
+        viewport: viewport,
+        enableWebGL: true,
+        renderInteractiveForms: true
       };
 
       await page.render(renderContext).promise;
@@ -928,19 +1037,6 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     }
   }
 
-  async renderAllPDFPages() {
-    if (!this.pdfDocument || !this.continuousContainer) {
-      return;
-    }
-
-    // Wait for container to be ready
-    setTimeout(async () => {
-      for (let pageNum = 1; pageNum <= this.totalPages; pageNum++) {
-        await this.renderPDFPageToContinuous(pageNum);
-      }
-    }, 100);
-  }
-
   async renderPDFPageToContinuous(pageNum: number) {
     if (!this.pdfDocument) return;
 
@@ -956,14 +1052,33 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
       const context = canvas.getContext('2d');
       if (!context) return;
 
-      const viewport = page.getViewport({ scale: this.scale, rotation: this.rotation });
+      // Get device pixel ratio (safe for SSR)
+      const outputScale = this.isBrowser && typeof window !== 'undefined' 
+        ? (window.devicePixelRatio || 1) 
+        : 1;
+
+      const viewport = page.getViewport({ 
+        scale: this.scale * outputScale, 
+        rotation: this.rotation 
+      });
       
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+
+      canvas.style.width = Math.floor(viewport.width / outputScale) + 'px';
+      canvas.style.height = Math.floor(viewport.height / outputScale) + 'px';
+
+      // Enable high quality rendering
+      context.imageSmoothingEnabled = false;
+      (context as any).webkitImageSmoothingEnabled = false;
+      (context as any).mozImageSmoothingEnabled = false;
+      (context as any).msImageSmoothingEnabled = false;
 
       const renderContext = {
         canvasContext: context,
-        viewport: viewport
+        viewport: viewport,
+        enableWebGL: true,
+        renderInteractiveForms: true
       };
 
       await page.render(renderContext).promise;
@@ -972,6 +1087,19 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     }
   }
 
+  async renderAllPDFPages() {
+    if (!this.pdfDocument || !this.continuousContainer) {
+      return;
+    }
+
+    setTimeout(async () => {
+      for (let pageNum = 1; pageNum <= this.totalPages; pageNum++) {
+        await this.renderPDFPageToContinuous(pageNum);
+      }
+    }, 100);
+  }
+
+  // Rest of the methods remain the same...
   async loadWord() {
     try {
       this.loadingMessage = 'Processing Word document...';
@@ -997,7 +1125,14 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
   }
 
   splitWordIntoPages() {
-    // Simple page splitting logic
+    // Only access document in browser environment
+    if (!this.isBrowser) {
+      this.wordPages = [this.wordContent];
+      this.totalWordPages = 1;
+      this.currentWordPage = 1;
+      return;
+    }
+
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = this.wordContent;
     
@@ -1005,11 +1140,11 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     const pages: string[] = [];
     let currentPage = '';
     let currentHeight = 0;
-    const maxHeight = 900; // Approximate height for A4 page
+    const maxHeight = 900;
 
     elements.forEach(element => {
       const elementHtml = element.outerHTML;
-      const estimatedHeight = 50; // Simplified height estimation
+      const estimatedHeight = 50;
 
       if (currentHeight + estimatedHeight > maxHeight && currentPage) {
         pages.push(currentPage);
@@ -1079,7 +1214,6 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
   }
 
   async loadPPT() {
-    // Simplified PPT loading - in real implementation, you'd use a library
     this.loadingMessage = 'Processing PowerPoint presentation...';
     this.totalSlides = 5;
     this.currentSlide = 1;
@@ -1129,12 +1263,36 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     throw new Error('Invalid source type');
   }
 
-  // View Mode Toggle
+  onContinuousScroll(event: Event) {
+    const container = event.target as HTMLElement;
+    const scrollPosition = container.scrollTop;
+    const pages = container.querySelectorAll('.pdf-page-wrapper');
+    
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i] as HTMLElement;
+      const pageTop = page.offsetTop - container.offsetTop;
+      const pageBottom = pageTop + page.offsetHeight;
+      
+      if (scrollPosition >= pageTop && scrollPosition < pageBottom) {
+        const pageNum = parseInt(page.getAttribute('data-page') || '1');
+        if (this.currentPage !== pageNum) {
+          this.currentPage = pageNum;
+          this.pageChange.emit({
+            page: pageNum,
+            totalPages: this.totalPages,
+            type: 'pdf',
+            viewMode: 'continuous'
+          });
+        }
+        break;
+      }
+    }
+  }
+
   toggleViewMode() {
     this.viewMode = this.viewMode === 'continuous' ? 'page' : 'continuous';
     this.viewModeChange.emit(this.viewMode);
 
-    // Re-render content based on new view mode
     if (this.fileType === 'pdf') {
       if (this.viewMode === 'continuous') {
         setTimeout(() => this.renderAllPDFPages(), 100);
@@ -1146,7 +1304,6 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     }
   }
 
-  // Navigation methods (existing ones remain the same)
   firstPage() {
     if (this.currentPage > 1) {
       this.currentPage = 1;
@@ -1184,7 +1341,6 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     this.renderPDFPage(this.currentPage);
   }
 
-  // Word navigation
   firstWordPage() {
     if (this.currentWordPage > 1) {
       this.currentWordPage = 1;
@@ -1213,7 +1369,6 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     }
   }
 
-  // Zoom controls
   zoomIn() {
     if (this.scale < 3) {
       this.scale += 0.25;
@@ -1271,7 +1426,6 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     }
   }
 
-  // Rotation
   rotate(degrees: number) {
     this.rotation = (this.rotation + degrees) % 360;
     if (this.viewMode === 'continuous') {
@@ -1281,9 +1435,13 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     }
   }
 
-  // Download methods
   async downloadPDF() {
     if (!this.viewerConfig.enableDownload && this.viewerConfig.enableDownload !== undefined) {
+      return;
+    }
+
+    // Only allow downloads in browser environment
+    if (!this.isBrowser || typeof window === 'undefined') {
       return;
     }
 
@@ -1310,6 +1468,11 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
       return;
     }
 
+    // Only allow downloads in browser environment
+    if (!this.isBrowser || typeof window === 'undefined') {
+      return;
+    }
+
     if (typeof this.src === 'string') {
       window.open(this.src, '_blank');
     } else {
@@ -1330,6 +1493,11 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
 
   downloadExcel() {
     if (!this.viewerConfig.enableDownload && this.viewerConfig.enableDownload !== undefined) {
+      return;
+    }
+
+    // Only allow downloads in browser environment
+    if (!this.isBrowser || typeof window === 'undefined') {
       return;
     }
 
@@ -1358,9 +1526,13 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     console.log('Download PowerPoint presentation');
   }
 
-  // Print methods
   printPDF() {
     if (!this.viewerConfig.enablePrint && this.viewerConfig.enablePrint !== undefined) {
+      return;
+    }
+
+    // Only allow printing in browser environment
+    if (!this.isBrowser || typeof window === 'undefined') {
       return;
     }
 
@@ -1378,6 +1550,11 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
 
   printWord() {
     if (!this.viewerConfig.enablePrint && this.viewerConfig.enablePrint !== undefined) {
+      return;
+    }
+
+    // Only allow printing in browser environment
+    if (!this.isBrowser || typeof window === 'undefined') {
       return;
     }
 
@@ -1410,12 +1587,10 @@ export class NgxUniversalFileViewerComponent implements OnInit, OnChanges {
     }
   }
 
-  // Excel sheet change
   onSheetChange() {
     this.renderExcelSheet(this.currentSheet);
   }
 
-  // PPT navigation
   previousSlide() {
     if (this.currentSlide > 1) {
       this.currentSlide--;

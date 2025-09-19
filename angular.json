@@ -12,12 +12,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/ngx-universal-file-viewer/ng-package.json",
-             "allowedCommonJsDependencies": [
-              "mammoth",
-              "xlsx",
-              "pdfjs-dist"
-            ]
+            "project": "projects/ngx-universal-file-viewer/ng-package.json"
           },
           "configurations": {
             "production": {
