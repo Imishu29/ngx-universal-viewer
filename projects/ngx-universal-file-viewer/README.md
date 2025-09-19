@@ -1,24 +1,151 @@
+
 # NgxUniversalFileViewer
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.0.
+[![npm version](https://badge.fury.io/js/ngx-universal-file-viewer.svg)](https://www.npmjs.com/package/ngx-universal-file-viewer)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Angular](https://img.shields.io/badge/Angular-12%2B-red)](https://angular.io/)
 
-## Code scaffolding
+A powerful and versatile Angular component for viewing multiple file formats including PDF, Word (DOC/DOCX), Excel (XLS/XLSX), and PowerPoint (PPT/PPTX) files with both continuous scroll and page-by-page view modes.
 
-Run `ng generate component component-name --project ngx-universal-file-viewer` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ngx-universal-file-viewer`.
-> Note: Don't forget to add `--project ngx-universal-file-viewer` or else it will be added to the default project in your `angular.json` file. 
+## ✨ Features
 
-## Build
+- 📄 **PDF Viewer** - Full-featured PDF viewing with zoom, rotation, navigation
+- 📝 **Word Documents** - Display DOC and DOCX files with proper formatting
+- 📊 **Excel Spreadsheets** - View XLS and XLSX files with sheet navigation
+- 📽️ **PowerPoint Presentations** - View PPT and PPTX slides
+- 🔄 **Dual View Modes** - Toggle between continuous scroll and page-by-page view
+- 🎨 **Customizable Toolbar** - Configure which controls to display
+- 📱 **Responsive Design** - Works seamlessly on desktop and mobile devices
+- ⬇️ **Download Control** - Enable/disable file downloads
+- 🖨️ **Print Support** - Print documents directly from the viewer
+- 🔍 **Auto File Type Detection** - Automatically detects file type from extension
+- 🌐 **SSR Compatible** - Works with Angular Universal
+- 💪 **TypeScript Support** - Fully typed for better development experience
 
-Run `ng build ngx-universal-file-viewer` to build the project. The build artifacts will be stored in the `dist/` directory.
+## 📋 Compatibility
 
-## Publishing
+| Angular Version | Package Version |
+|----------------|-----------------|
+| 17.x           | 1.x.x          |
+| 16.x           | 1.x.x          |
+| 15.x           | 1.x.x          |
+| 14.x           | 1.x.x          |
+| 13.x           | 1.x.x          |
+| 12.x           | 1.x.x          |
 
-After building your library with `ng build ngx-universal-file-viewer`, go to the dist folder `cd dist/ngx-universal-file-viewer` and run `npm publish`.
+## 📦 Installation
 
-## Running unit tests
+### Step 1: Install the package
 
-Run `ng test ngx-universal-file-viewer` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```bash
+npm install ngx-universal-file-viewer
+```
 
-## Further help
+#### Or Using Yarn:
+```bash
+yarn add ngx-universal-file-viewer
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+🚀 Getting Started
+For Angular 14+ (Standalone Components)
+
+```bash
+import { Component } from '@angular/core';
+import { NgxUniversalFileViewerComponent } from 'ngx-universal-file-viewer';
+
+@Component({
+  selector: 'app-document-viewer',
+  standalone: true,
+  imports: [NgxUniversalFileViewerComponent],
+  template: `
+    <ngx-universal-file-viewer
+      [src]="fileUrl"
+      [fileType]="'auto'"
+      [viewMode]="'continuous'">
+    </ngx-universal-file-viewer>
+  `
+})
+export class DocumentViewerComponent {
+  fileUrl = 'assets/sample.pdf';
+}
+```
+For Angular 12-13 (Module-based)
+```bash 
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgxUniversalFileViewerModule } from 'ngx-universal-file-viewer';
+
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [
+    BrowserModule,
+    NgxUniversalFileViewerModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+📖 Basic Usage
+Simple Implementation
+```bash
+<ngx-universal-file-viewer
+  [src]="fileUrl"
+  [fileType]="'auto'">
+</ngx-universal-file-viewer>
+```
+TypeScript
+```bash
+export class AppComponent {
+  fileUrl = 'https://example.com/document.pdf';
+}
+```
+With All Options
+```bash
+<ngx-universal-file-viewer
+  [src]="fileSource"
+  [fileType]="fileType"
+  [viewMode]="viewMode"
+  [showToolbar]="showToolbar"
+  [viewerConfig]="viewerConfig"
+  [toolbarConfig]="toolbarConfig"
+  (onLoad)="handleLoad($event)"
+  (onError)="handleError($event)"
+  (pageChange)="handlePageChange($event)"
+  (viewModeChange)="handleViewModeChange($event)">
+</ngx-universal-file-viewer>
+```
+
+### 📱 Mobile Support
+#### The viewer is fully responsive and works on mobile devices:
+
+##### Touch gestures for scrolling
+##### Pinch to zoom (PDF)
+##### Responsive toolbar
+##### Optimized for small screens
+##### 🔒 Security
+##### Sanitizes HTML content for Word documents
+##### Validates file types
+##### Secure handling of file sources
+##### No external dependencies for sensitive operations
+
+
+### 🐛 Troubleshooting
+##### Issue: PDF not loading
+##### Solution: Ensure PDF.js is properly loaded:
+
+
+
+
+#### 🙏 Acknowledgments
+##### PDF.js - PDF rendering
+##### Mammoth.js - Word document conversion
+##### SheetJS - Excel file processing
+
+
+
+### 📞 Support
+##### For support, email abhishekrout128@gmail.com..
+
