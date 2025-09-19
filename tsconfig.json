@@ -9,6 +9,11 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
+    "paths": {
+      "ngx-universal-file-viewer": [
+        "./dist/ngx-universal-file-viewer"
+      ]
+    },
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,
