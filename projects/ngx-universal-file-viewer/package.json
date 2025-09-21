@@ -1,6 +1,6 @@
 {
   "name": "ngx-universal-file-viewer",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "A powerful Angular component for viewing PDF, Word, Excel, and PowerPoint files with continuous scroll and page-by-page view modes. Supports Angular 12+",
   "author": {
     "name": "Abhishek Rout",
@@ -38,6 +38,7 @@
   "dependencies": {
     "mammoth": "^1.6.0",
     "xlsx": "^0.18.5",
+    "docx-preview": "^0.3.0",
     "tslib": "^2.3.0"
   },
   "sideEffects": false

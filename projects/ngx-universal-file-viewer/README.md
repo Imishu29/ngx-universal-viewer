@@ -22,16 +22,7 @@ A powerful and versatile Angular component for viewing multiple file formats inc
 - 🌐 **SSR Compatible** - Works with Angular Universal
 - 💪 **TypeScript Support** - Fully typed for better development experience
 
-## 📋 Compatibility
 
-| Angular Version | Package Version |
-|----------------|-----------------|
-| 17.x           | 1.x.x          |
-| 16.x           | 1.x.x          |
-| 15.x           | 1.x.x          |
-| 14.x           | 1.x.x          |
-| 13.x           | 1.x.x          |
-| 12.x           | 1.x.x          |
 
 ## 📦 Installation
 
