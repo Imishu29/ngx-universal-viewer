@@ -170,11 +170,7 @@ export interface PageChangeEvent {
       <div class="word-viewer" *ngIf="fileType==='word' && !isLoading && !errorMessage">
         <div class="word-controls" *ngIf="showToolbar">
           <div class="control-group" *ngIf="toolbarConfig.showViewModeToggle !== false">
-            <button (click)="toggleViewMode()" class="view-mode-btn">
-              <svg *ngIf="viewMode==='continuous'" width="20" height="20" viewBox="0 0 24 24"><path d="M3 3v8h8V3H3zm6 6H5V5h4v4zm-6 4v8h8v-8H3zm6 6H5v-4h4v4zm4-16v8h8V3h-8zm6 6h-4V5h4v4zm-6 4v8h8v-8h-8zm6 6h-4v-4h4v4z"/></svg>
-              <svg *ngIf="viewMode==='page'" width="20" height="20" viewBox="0 0 24 24"><path d="M3 9h18v2H3V9zm0 4h18v2H3v-2z"/></svg>
-              {{ viewMode==='continuous' ? 'Page View' : 'Continuous View' }}
-            </button>
+            
           </div>
 
           <div class="control-group" *ngIf="toolbarConfig.showZoom !== false">

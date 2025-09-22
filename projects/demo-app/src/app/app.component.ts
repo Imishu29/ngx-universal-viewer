@@ -58,7 +58,7 @@ import {
   ],
 })
 export class AppComponent {
-  fileSource = 'assets/hello.pdf'; // Change to your file path
+  fileSource = 'assets/hello.docx'; // Change to your file path
   currentPageInfo: PageChangeEvent | null = null;
 
   toolbarOptions: ToolbarConfig = {

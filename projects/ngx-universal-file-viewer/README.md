@@ -16,8 +16,6 @@ A powerful and versatile Angular component for viewing multiple file formats inc
 - 🔄 **Dual View Modes** - Toggle between continuous scroll and page-by-page view
 - 🎨 **Customizable Toolbar** - Configure which controls to display
 - 📱 **Responsive Design** - Works seamlessly on desktop and mobile devices
-- ⬇️ **Download Control** - Enable/disable file downloads
-- 🖨️ **Print Support** - Print documents directly from the viewer
 - 🔍 **Auto File Type Detection** - Automatically detects file type from extension
 - 🌐 **SSR Compatible** - Works with Angular Universal
 - 💪 **TypeScript Support** - Fully typed for better development experience
